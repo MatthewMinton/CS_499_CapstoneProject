@@ -6,7 +6,9 @@ public class Monkey extends RescueAnimal {
     private String height;
     private String bodyLength;
 
-    public Monkey(String name, String gender, String age, String weight, String acquisitionDate, String acquisitionCountry, String trainingStatus, boolean reserved, String inServiceCountry, String species, String tailLength, String height, String bodyLength) {
+    public Monkey(String name, String gender, String age, String weight, String acquisitionDate,
+                  String acquisitionCountry, String trainingStatus, boolean reserved, String inServiceCountry,
+                  String species, String tailLength, String height, String bodyLength) {
         this.setName(name);
         this.setGender(gender);
         this.setAge(age);
@@ -20,6 +22,7 @@ public class Monkey extends RescueAnimal {
         this.setTailLength(tailLength);
         this.setHeight(height);
         this.setBodyLength(bodyLength);
+        this.setAnimalType("monkey");
     }
 
     public String getSpecies() {
@@ -52,5 +55,11 @@ public class Monkey extends RescueAnimal {
 
     public void setBodyLength(String bodyLength) {
         this.bodyLength = bodyLength;
+    }
+
+    @Override
+    public String toString() {
+        return "Monkey{name='" + getName() + "', species='" + species + "', age='" + getAge() +
+                "', reserved=" + getReserved() + ", inServiceCountry='" + getInServiceLocation() + "'}";
     }
 }

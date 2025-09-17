@@ -12,8 +12,7 @@ public class RescueAnimal {
     private boolean reserved;
     private String inServiceCountry;
 
-    public RescueAnimal() {
-    }
+    public RescueAnimal() {}
 
     public String getName() {
         return this.name;
@@ -93,5 +92,13 @@ public class RescueAnimal {
 
     public void setTrainingStatus(String trainingStatus) {
         this.trainingStatus = trainingStatus;
+    }
+
+    @Override
+    public String toString() {
+        return "RescueAnimal{type='" + animalType + "', name='" + name + "', gender='" + gender +
+                "', age='" + age + "', weight='" + weight + "', acquisitionDate='" + acquisitionDate +
+                "', acquisitionCountry='" + acquisitionCountry + "', trainingStatus='" + trainingStatus +
+                "', reserved=" + reserved + ", inServiceCountry='" + inServiceCountry + "'}";
     }
 }
