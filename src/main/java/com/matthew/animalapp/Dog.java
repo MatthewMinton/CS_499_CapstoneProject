@@ -1,8 +1,8 @@
 package com.matthew.animalapp;
 
-
-
-
+/**
+ * Dog class extends RescueAnimal with the breed attribute.
+ */
 public class Dog extends RescueAnimal {
     private String breed;
 
@@ -21,13 +21,8 @@ public class Dog extends RescueAnimal {
         this.setAnimalType("dog");
     }
 
-    public String getBreed() {
-        return this.breed;
-    }
-
-    public void setBreed(String dogBreed) {
-        this.breed = dogBreed;
-    }
+    public String getBreed() { return this.breed; }
+    public void setBreed(String dogBreed) { this.breed = dogBreed; }
 
     @Override
     public String toString() {

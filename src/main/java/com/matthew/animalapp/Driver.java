@@ -1,49 +1,45 @@
-
 ///***********************************************************************************************************************
-/// Author: Matthew Minton                                                                                               *
-/// Course: CS 499 Computer Science capstone project.                                                                    *
-/// Purpose: This software is derived from project 2 of IT 145: Foundation in application development.                   *
-///   My intent is to take the original code (some provided other sections created) and build upon them to               *
-///   show the extent of my growth in software development during my time as a student at SNHU. This software uses a     *
-///   command line interface that allows users to intake animals, in this case only monkeys and dogs currently, and save *
-///   so they can be reserved for training to be used as service animals.                                                *
-///                                                                                                                      *
-
+/// Author: Matthew Minton
+/// Course: CS 499 Computer Science Capstone Project
+/// Purpose: This software is derived from project 2 of IT 145: Foundation in Application Development.
+///   My intent is to take the original code (some provided, other sections created) and build upon them to
+///   show the extent of my growth in software development during my time as a student at SNHU. This software uses a
+///   command line interface that allows users to intake animals (monkeys and dogs) and save them so they can
+///   be reserved for training and later deployed as service animals.
+///***********************************************************************************************************************
 
 package com.matthew.animalapp;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
+/**
+ * Driver acts as the controller for the Rescue Animal application.
+ * Its responsibility is limited to menu navigation and delegating work
+ * to supporting classes such as AnimalManager (business logic) and
+ * IntakeMenu (user-facing messages).
+ *
+ * By keeping Driver lightweight, business logic remains modular and testable.
+ */
 public class Driver {
-    /**
-     * The main method that drives the rescue animal system application.
-     * It presents a menu to the user, takes their input, and performs
-     * actions based on the selected option within a loop.
-     *
-     */
+
     public static void main(String[] args) {
-        // Create a single Scanner object for all user input.
-        // It's a best practice to create it once and pass it around.
         Scanner input = new Scanner(System.in);
-        String userChoice = "";
         boolean continueMenu = true;
 
-        // Main application loop. The program runs as long as continueMenu is true.
+        // Main application loop. Runs until the user chooses to quit.
         while (continueMenu) {
             char option;
             boolean validOption;
 
-            // Loop to handle menu selection and re-prompt for invalid input.
+            // Menu validation loop
             do {
                 IntakeMenu.displayMainMenu();
                 try {
-                    // Get the user's choice and consume the rest of the line.
                     option = input.next().toLowerCase().charAt(0);
-                    input.nextLine();
-                    validOption = true; // Assume valid until proven otherwise.
+                    input.nextLine(); // consume newline
+                    validOption = true;
 
-                    // Check if the option is one of the valid choices.
                     switch (option) {
                         case '1':
                             AnimalManager.intakeNewDog(input);
@@ -54,45 +50,41 @@ public class Driver {
                         case '3':
                             AnimalManager.reserveAnimal(input);
                             break;
-                        case '4':
-                            AnimalManager.printAnimals(option);
-                            break;
-                        case '5':
-                            AnimalManager.printAnimals(option);
-                            break;
-                        case '6':
+                        case '4': case '5': case '6':
                             AnimalManager.printAnimals(option);
                             break;
                         case 'q':
                             IntakeMenu.displayExitMessage();
-                            continueMenu = false; // Set flag to exit main loop
+                            continueMenu = false;
                             break;
                         default:
-                            validOption = false; // Invalid option, loop again.
+                            validOption = false;
                             IntakeMenu.displayInvalidOption();
                             break;
                     }
                 } catch (InputMismatchException e) {
-                    // Catch cases where the user enters non-character input
                     validOption = false;
                     IntakeMenu.displayInvalidOption();
-                    input.nextLine(); // Clear the buffer after an error
-                    option = '\0'; // Set to a default value to satisfy the loop condition
+                    input.nextLine(); // clear bad input
+                    option = '\0';
                 }
-            } while (!validOption); // Continue this inner loop until a valid option is entered.
+            } while (!validOption);
 
-            // After a task is performed (unless the user quit), ask to return to menu.
+            // Restart prompt with strict validation
             if (continueMenu) {
-                System.out.print("Return to main menu? (y/n): ");
-                String restart = input.nextLine();
-                if (!restart.equalsIgnoreCase("y")) {
+                String restart;
+                do {
+                    System.out.print("Return to main menu? (y/n): ");
+                    restart = input.nextLine().trim();
+                } while (!restart.equalsIgnoreCase("y") && !restart.equalsIgnoreCase("n"));
+
+                if (restart.equalsIgnoreCase("n")) {
                     IntakeMenu.displayExitMessage();
                     continueMenu = false;
                 }
             }
         }
 
-        // Close the scanner resource when the program exits.
-        input.close();
+        input.close(); // close scanner at exit
     }
 }
