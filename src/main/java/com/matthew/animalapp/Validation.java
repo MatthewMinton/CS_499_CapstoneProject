@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+
 /**
  * Validation class centralizes all input checks for the rescue animal system.
  *
@@ -25,6 +26,9 @@ public class Validation {
     private static final double MAX_HEIGHT = 40.0;
     private static final double MIN_BODY_LENGTH = 1.0;
     private static final double MAX_BODY_LENGTH = 40.0;
+    public static final String[] ACCEPTED_COUNTRIES = {"United States", "Canada", "Argentina", "Colombia"};
+    public static final String[] ACCEPTED_BREEDS = {"French Bulldog", "Labrador Retriever", "Golden Retriever", "German Shepherd", "Poodle",
+        "Bulldog", "Dachshund", "Beagle", "Rottweiler", "English Pointer"};
 
     // ---------------- NAME & GENDER ----------------
 
@@ -93,6 +97,21 @@ public class Validation {
         String[] validStatuses = {"intake", "Phase I", "Phase II", "Phase III", "Phase IV", "in service"};
         for (String valid : validStatuses) {
             if (valid.equalsIgnoreCase(status)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ---------------- BREEDS ----------------
+
+    /**
+     * Validate dog breeds. For sake of project, only limited breeds are included.
+     */
+    public static boolean validateBreed(String breed) {
+        String[] validBreed = ACCEPTED_BREEDS;
+        for (String valid : validBreed) {
+            if (valid.equalsIgnoreCase(breed)) {
                 return true;
             }
         }
@@ -173,5 +192,17 @@ public class Validation {
      */
     public static boolean validateReserveAnimal(String animalType) {
         return animalType.equalsIgnoreCase("dog") || animalType.equalsIgnoreCase("monkey");
+    }
+
+    // ---------------------COUNTRY---------------------
+
+    public static boolean validateCountry(String country) {
+        String[] validCountry = ACCEPTED_COUNTRIES;
+        for (String valid : validCountry) {
+            if (valid.equalsIgnoreCase(country)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

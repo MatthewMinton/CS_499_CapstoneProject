@@ -1,6 +1,7 @@
 package com.matthew.animalapp;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -78,10 +79,15 @@ public class AnimalManager {
             }
         }
 
-        // Breed (TODO: could validate with an external list in future)
-        System.out.println("What is the dog's breed?");
-        String breed = scanner.nextLine().trim();
-        if (cancelCheck(breed, "Dog intake cancelled.")) return;
+        String breed;
+        do {
+            System.out.println("What is the dog's breed? \nAccepted: " + Arrays.toString(Validation.ACCEPTED_BREEDS));
+            breed = scanner.nextLine().trim();
+            if (cancelCheck(breed, "Dog intake cancelled.")) return;
+            if (!Validation.validateBreed(breed)) {
+                System.out.println("Invalid breed. Accepted: " + Arrays.toString(Validation.ACCEPTED_BREEDS));
+            }
+        } while (!Validation.validateBreed(breed));
 
         // Gender
         String gender;
@@ -128,9 +134,16 @@ public class AnimalManager {
         } while (!Validation.validateDate(acquisitionDate));
 
         // Acquisition Country
-        System.out.println("What is the dog's acquisition country?");
-        String acquisitionCountry = scanner.nextLine().trim();
-        if (cancelCheck(acquisitionCountry, "Dog intake cancelled.")) return;
+        String acquisitionCountry;
+        do {
+            System.out.println("What is the dog's acquisition country?" + "\nCurrently accepting animals from: " + Arrays.toString(Validation.ACCEPTED_COUNTRIES));
+            acquisitionCountry = scanner.nextLine().trim();
+            if (cancelCheck(acquisitionCountry, "Dog intake cancelled.")) return;
+            if (!Validation.validateCountry(acquisitionCountry)) {
+                System.out.println("Invalid country. Please choose from the following: \n" +
+                        Arrays.toString(Validation.ACCEPTED_COUNTRIES));
+            }
+        } while (!Validation.validateCountry(acquisitionCountry));
 
         // Training Status
         String trainingStatus;
@@ -147,9 +160,16 @@ public class AnimalManager {
         boolean reserved = getReservedStatus(scanner, "dog");
 
         // In-service Country
-        System.out.println("Which country is the dog in service?");
-        String inServiceCountry = scanner.nextLine().trim();
-        if (cancelCheck(inServiceCountry, "Dog intake cancelled.")) return;
+        String inServiceCountry;
+        do {
+            System.out.println("What is the dog's in service country?" + "\nCurrently accepting animals from: " + Arrays.toString(Validation.ACCEPTED_COUNTRIES));
+            inServiceCountry = scanner.nextLine().trim();
+            if (cancelCheck(inServiceCountry, "Dog intake cancelled.")) return;
+            if (!Validation.validateCountry(inServiceCountry)) {
+                System.out.println("Invalid country. Please choose from the following: \n" +
+                        Arrays.toString(Validation.ACCEPTED_COUNTRIES));
+            }
+        } while (!Validation.validateCountry(inServiceCountry));
 
         Dog newDog = new Dog(name, breed, gender, age, weight,
                 acquisitionDate, acquisitionCountry, trainingStatus, reserved, inServiceCountry);
@@ -227,9 +247,16 @@ public class AnimalManager {
         } while (!Validation.validateDate(acquisitionDate));
 
         // Acquisition Country
-        System.out.println("What is the monkey's acquisition country?");
-        String acquisitionCountry = scanner.nextLine().trim();
-        if (cancelCheck(acquisitionCountry, "Monkey intake cancelled.")) return;
+        String acquisitionCountry;
+        do {
+            System.out.println("What is the monkey's acquisition country?" + "\nCurrently accepting animals from: " + Arrays.toString(Validation.ACCEPTED_COUNTRIES));
+            acquisitionCountry = scanner.nextLine().trim();
+            if (cancelCheck(acquisitionCountry, "Monkey intake cancelled.")) return;
+            if (!Validation.validateCountry(acquisitionCountry)) {
+                System.out.println("Invalid country. Please choose from the following: \n" +
+                       Arrays.toString(Validation.ACCEPTED_COUNTRIES));
+            }
+        } while (!Validation.validateCountry(acquisitionCountry));
 
         // Training Status
         String trainingStatus;
@@ -242,18 +269,23 @@ public class AnimalManager {
             }
         } while (!Validation.validateTrainingStatus(trainingStatus));
 
-        // Reserved status
-        boolean reserved = getReservedStatus(scanner, "monkey");
 
         // In-service Country
-        System.out.println("Which country is the monkey in service?");
-        String inServiceCountry = scanner.nextLine().trim();
-        if (cancelCheck(inServiceCountry, "Monkey intake cancelled.")) return;
+        String inServiceCountry;
+        do {
+            System.out.println("What is the monkey's in service country?" + "\nCurrently accepting animals from: " + Arrays.toString(Validation.ACCEPTED_COUNTRIES));
+            inServiceCountry = scanner.nextLine().trim();
+            if (cancelCheck(inServiceCountry, "Monkey intake cancelled.")) return;
+            if (!Validation.validateCountry(inServiceCountry)) {
+                System.out.println("Invalid country. Please choose from the following: \n" +
+                        Arrays.toString(Validation.ACCEPTED_COUNTRIES));
+            }
+        } while (!Validation.validateCountry(inServiceCountry));
 
         // Species
         String species;
         do {
-            System.out.println("What is the monkey's species?");
+            System.out.println("What is the monkey's species? \nAccepted: Capuchin, Guenon, Macaque, Tamarin");
             species = scanner.nextLine().trim();
             if (cancelCheck(species, "Monkey intake cancelled.")) return;
             if (!Validation.validateSpecies(species)) {
@@ -268,7 +300,7 @@ public class AnimalManager {
             tailLength = scanner.nextLine().trim();
             if (cancelCheck(tailLength, "Monkey intake cancelled.")) return;
             if (!Validation.validateTailLength(tailLength)) {
-                System.out.println("Invalid tail length. Must be a positive number.");
+                System.out.println("Invalid tail length. Must be a positive number between 1 and 25 inches.");
             }
         } while (!Validation.validateTailLength(tailLength));
 
@@ -279,7 +311,7 @@ public class AnimalManager {
             height = scanner.nextLine().trim();
             if (cancelCheck(height, "Monkey intake cancelled.")) return;
             if (!Validation.validateHeight(height)) {
-                System.out.println("Invalid height. Must be a positive number.");
+                System.out.println("Invalid height. Must be a positive number between 1 and 40 inches.");
             }
         } while (!Validation.validateHeight(height));
 
@@ -290,9 +322,13 @@ public class AnimalManager {
             bodyLength = scanner.nextLine().trim();
             if (cancelCheck(bodyLength, "Monkey intake cancelled.")) return;
             if (!Validation.validateBodyLength(bodyLength)) {
-                System.out.println("Invalid body length. Must be a positive number.");
+                System.out.println("Invalid body length. Must be a positive number between 1 and 40 inches.");
             }
         } while (!Validation.validateBodyLength(bodyLength));
+
+        // Reserved status
+        boolean reserved = getReservedStatus(scanner, "monkey");
+
 
         Monkey newMonkey = new Monkey(name, gender, age, weight,
                 acquisitionDate, acquisitionCountry, trainingStatus, reserved,
