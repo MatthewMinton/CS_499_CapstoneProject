@@ -3,6 +3,7 @@ package com.matthew.animalapp;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 
 
 /**
@@ -16,7 +17,7 @@ import java.time.format.DateTimeParseException;
 public class Validation {
 
     // ---------------- CONSTANTS ----------------
-    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("MM/dd/uuuu").withResolverStyle(ResolverStyle.STRICT);
     private static final int MAX_AGE = 50;
     private static final double MIN_WEIGHT = 0.1;
     private static final double MAX_WEIGHT = 300.0;
