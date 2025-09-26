@@ -1,48 +1,57 @@
 package com.matthew.animalapp;
 
 /**
- * Monkey class extends RescueAnimal with species-specific attributes.
+ * Monkey is a specific type of RescueAnimal.
+ * Adds species and body measurements.
  */
 public class Monkey extends RescueAnimal {
-    private String species;
-    private String tailLength;
-    private String height;
-    private String bodyLength;
 
-    public Monkey(String name, String gender, String age, String weight, String acquisitionDate,
-                  String acquisitionCountry, String trainingStatus, boolean reserved, String inServiceCountry,
-                  String species, String tailLength, String height, String bodyLength) {
-        this.setName(name);
-        this.setGender(gender);
-        this.setAge(age);
-        this.setWeight(weight);
-        this.setAcquisitionDate(acquisitionDate);
-        this.setAcquisitionLocation(acquisitionCountry);
-        this.setTrainingStatus(trainingStatus);
-        this.setReserved(reserved);
-        this.setInServiceCountry(inServiceCountry);
-        this.setSpecies(species);
-        this.setTailLength(tailLength);
-        this.setHeight(height);
-        this.setBodyLength(bodyLength);
-        this.setAnimalType("monkey");
+    private String species;
+    private double tailLength;
+    private double height;
+    private double bodyLength;
+
+    public Monkey(String name,
+                  String species,
+                  String gender,
+                  String age,
+                  String weight,
+                  String acquisitionDate,
+                  String acquisitionCountry,
+                  String trainingStatus,
+                  boolean reserved,
+                  String inServiceCountry,
+                  double tailLength,
+                  double height,
+                  double bodyLength) {
+        super(name, gender, age, weight, acquisitionDate, acquisitionCountry,
+                trainingStatus, reserved, inServiceCountry);
+        this.species = species;
+        this.tailLength = tailLength;
+        this.height = height;
+        this.bodyLength = bodyLength;
     }
 
-    public String getSpecies() { return this.species; }
+    public String getSpecies() { return species; }
     public void setSpecies(String species) { this.species = species; }
 
-    public String getTailLength() { return this.tailLength; }
-    public void setTailLength(String tailLength) { this.tailLength = tailLength; }
+    public double getTailLength() { return tailLength; }
+    public void setTailLength(double tailLength) { this.tailLength = tailLength; }
 
-    public String getHeight() { return this.height; }
-    public void setHeight(String height) { this.height = height; }
+    public double getHeight() { return height; }
+    public void setHeight(double height) { this.height = height; }
 
-    public String getBodyLength() { return this.bodyLength; }
-    public void setBodyLength(String bodyLength) { this.bodyLength = bodyLength; }
+    public double getBodyLength() { return bodyLength; }
+    public void setBodyLength(double bodyLength) { this.bodyLength = bodyLength; }
 
     @Override
     public String toString() {
-        return "Monkey{name='" + getName() + "', species='" + species + "', age='" + getAge() +
-                "', reserved=" + getReserved() + ", inServiceCountry='" + getInServiceLocation() + "'}";
+        return super.toString() +
+                "Species: " + species + "\n" +
+                "Age: " + getAge() + " years\n" +
+                "Weight: " + getWeight() + " lbs\n" +
+                "Tail Length: " + tailLength + " inches\n" +
+                "Height: " + height + " inches\n" +
+                "Body Length: " + bodyLength + " inches\n";
     }
 }

@@ -3,67 +3,53 @@ package com.matthew.animalapp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayInputStream;
-import java.util.Scanner;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class AnimalManagerTest {
+    AnimalManager manager;
+    Dog dog;
 
     @BeforeEach
-    void resetAnimalLists() {
-        // Reset lists to a clean state for each test
-        // Reflection could also be used, but here we just directly re-init.
-        try {
-            var dogListField = AnimalManager.class.getDeclaredField("dogList");
-            var monkeyListField = AnimalManager.class.getDeclaredField("monkeyList");
-            dogListField.setAccessible(true);
-            monkeyListField.setAccessible(true);
-            ((java.util.List<?>) dogListField.get(null)).clear();
-            ((java.util.List<?>) monkeyListField.get(null)).clear();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    void setup() {
+        manager = new AnimalManager();
+        dog = new Dog("Rex", "Labrador", "male", "3", "50",
+                "01/01/2022", "United States", "in service", false, "USA");
+        manager.addAnimal(dog);
     }
 
     @Test
-    void testIntakeNewDogAddsDog() {
-        String input = "Buddy\nBeagle\nmale\n5\n20.5\n01/01/2020\nUnited States\nintake\nfalse\nUnited States\n";
-        Scanner scanner = new Scanner(new ByteArrayInputStream(input.getBytes()));
-
-        AnimalManager.intakeNewDog(scanner);
-
-        // Verify dog was added
-        try {
-            var dogListField = AnimalManager.class.getDeclaredField("dogList");
-            dogListField.setAccessible(true);
-            var dogList = (java.util.List<Dog>) dogListField.get(null);
-
-            assertEquals(1, dogList.size());
-            assertEquals("Buddy", dogList.get(0).getName());
-        } catch (Exception e) {
-            fail("Failed to access dogList");
-        }
+    void testAddAndGetAnimal() {
+        RescueAnimal found = manager.getAnimalById(dog.getUniqueId());
+        assertNotNull(found);
+        assertEquals("Rex", found.getName());
     }
 
     @Test
-    void testReserveDogByCountry() {
-        Dog dog = new Dog("Buddy", "Beagle", "male", "5", "20.5",
-                "01/01/2020", "United States", "intake", false, "United States");
+    void testRemoveAnimal() {
+        assertTrue(manager.removeAnimal(dog.getUniqueId()));
+        assertNull(manager.getAnimalById(dog.getUniqueId()));
+    }
 
-        try {
-            var dogListField = AnimalManager.class.getDeclaredField("dogList");
-            dogListField.setAccessible(true);
-            var dogList = (java.util.List<Dog>) dogListField.get(null);
-            dogList.add(dog);
-        } catch (Exception e) {
-            fail("Failed to seed dogList");
-        }
+    @Test
+    void testReserveAndUnreserveAnimal() {
+        manager.reserveAnimal(dog.getUniqueId());
+        assertTrue(manager.getAnimalById(dog.getUniqueId()).isReserved());
+        manager.unreserveAnimal(dog.getUniqueId());
+        assertFalse(manager.getAnimalById(dog.getUniqueId()).isReserved());
+    }
 
-        String input = "Dog\nUnited States\n";
-        Scanner scanner = new Scanner(new ByteArrayInputStream(input.getBytes()));
-        AnimalManager.reserveAnimal(scanner);
+    @Test
+    void testListByType() {
+        List<RescueAnimal> dogs = manager.listByType("dog");
+        assertEquals(1, dogs.size());
+        assertEquals("Rex", dogs.get(0).getName());
+    }
 
-        assertTrue(dog.getReserved());
+    @Test
+    void testListAvailableForService() {
+        List<RescueAnimal> available = manager.listAvailableForService("dog");
+        assertEquals(1, available.size());
     }
 }

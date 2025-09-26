@@ -1,32 +1,38 @@
 package com.matthew.animalapp;
 
 /**
- * Dog class extends RescueAnimal with the breed attribute.
+ * Dog is a specific type of RescueAnimal.
+ * Adds breed field.
  */
 public class Dog extends RescueAnimal {
+
     private String breed;
 
-    public Dog(String name, String breed, String gender, String age, String weight, String acquisitionDate,
-               String acquisitionCountry, String trainingStatus, boolean reserved, String inServiceCountry) {
-        this.setName(name);
-        this.setBreed(breed);
-        this.setGender(gender);
-        this.setAge(age);
-        this.setWeight(weight);
-        this.setAcquisitionDate(acquisitionDate);
-        this.setAcquisitionLocation(acquisitionCountry);
-        this.setTrainingStatus(trainingStatus);
-        this.setReserved(reserved);
-        this.setInServiceCountry(inServiceCountry);
-        this.setAnimalType("dog");
+    public Dog(String name,
+               String breed,
+               String gender,
+               String age,
+               String weight,
+               String acquisitionDate,
+               String acquisitionCountry,
+               String trainingStatus,
+               boolean reserved,
+               String inServiceCountry) {
+        super(name, gender, age, weight, acquisitionDate, acquisitionCountry,
+                trainingStatus, reserved, inServiceCountry);
+        this.breed = breed;
     }
 
-    public String getBreed() { return this.breed; }
-    public void setBreed(String dogBreed) { this.breed = dogBreed; }
+    public String getBreed() { return breed; }
+
+    public void setBreed(String breed) { this.breed = breed; }
 
     @Override
     public String toString() {
-        return "Dog{name='" + getName() + "', breed='" + breed + "', age='" + getAge() +
-                "', reserved=" + getReserved() + ", inServiceCountry='" + getInServiceLocation() + "'}";
+        return super.toString() +
+                "Breed: " + breed + "\n" +
+                "Age: " + getAge() + " years\n" +
+                "Weight: " + getWeight() + " lbs\n";
+
     }
 }
