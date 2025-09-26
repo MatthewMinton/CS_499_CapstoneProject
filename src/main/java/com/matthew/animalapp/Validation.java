@@ -3,207 +3,196 @@ package com.matthew.animalapp;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.time.format.ResolverStyle;
-
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Scanner;
+import java.util.Set;
 
 /**
- * Validation class centralizes all input checks for the rescue animal system.
- *
- * The goal is to keep business logic (AnimalManager) focused on workflows,
- * while all data integrity rules live here. This separation improves readability,
- * reusability, and makes it easier to adjust rules later without touching
- * intake/reservation code.
+ * Validation utilities for console input.
+ * Provides cancel handling, yes/no prompts, and restricted input checks.
  */
-public class Validation {
+public final class Validation {
 
-    // ---------------- CONSTANTS ----------------
-    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("MM/dd/uuuu").withResolverStyle(ResolverStyle.STRICT);
-    private static final int MAX_AGE = 50;
-    private static final double MIN_WEIGHT = 0.1;
-    private static final double MAX_WEIGHT = 300.0;
-    private static final double MIN_TAIL_LENGTH = 1.0;
-    private static final double MAX_TAIL_LENGTH = 25.0;
-    private static final double MIN_HEIGHT = 1.0;
-    private static final double MAX_HEIGHT = 40.0;
-    private static final double MIN_BODY_LENGTH = 1.0;
-    private static final double MAX_BODY_LENGTH = 40.0;
-    public static final String[] ACCEPTED_COUNTRIES = {"United States", "Canada", "Argentina", "Colombia"};
-    public static final String[] ACCEPTED_BREEDS = {"French Bulldog", "Labrador Retriever", "Golden Retriever", "German Shepherd", "Poodle",
-        "Bulldog", "Dachshund", "Beagle", "Rottweiler", "English Pointer"};
+    private static final Set<String> ALLOWED_BREEDS = new HashSet<>(Arrays.asList(
+            "German Shepherd", "Labrador Retriever", "Belgian Malinois", "Bloodhound"
+    ));
 
-    // ---------------- NAME & GENDER ----------------
+    private static final Set<String> ALLOWED_MONKEY_SPECIES = new HashSet<>(Arrays.asList(
+            "Capuchin", "Guenon", "Macaque", "Marmoset", "Squirrel monkey", "Tamarin"
+    ));
 
-    /**
-     * Validates animal name. Must be letters and spaces only, non-empty.
-     * This avoids weird entries like numbers or punctuation in names.
-     */
-    public static boolean validateName(String name) {
-        return name != null && name.matches("[A-Za-z ]+") && !name.trim().isEmpty();
+    private static final Set<String> ALLOWED_COUNTRIES = new HashSet<>(Arrays.asList(
+            "United States", "Canada", "Mexico"
+    ));
+
+    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+
+    private Validation() {
+        // utility class, no instances
     }
 
-    /**
-     * Validates gender field. Keeps it consistent with system assumptions.
-     */
-    public static boolean validateGender(String gender) {
-        return gender.equalsIgnoreCase("male") || gender.equalsIgnoreCase("female");
-    }
+    // ===== Cancel handling =====
+    public static class CancelException extends RuntimeException {}
 
-    // ---------------- AGE & WEIGHT ----------------
-
-    /**
-     * Validates age as integer between 0 and MAX_AGE.
-     */
-    public static boolean validateAge(String age) {
-        try {
-            int num = Integer.parseInt(age);
-            return num >= 0 && num <= MAX_AGE;
-        } catch (NumberFormatException e) {
-            return false;
+    public static void checkCancel(String input) {
+        if (input != null && input.trim().equalsIgnoreCase("cancel")) {
+            throw new CancelException();
         }
     }
 
-    /**
-     * Validates weight as double between MIN_WEIGHT and MAX_WEIGHT.
-     */
-    public static boolean validateWeight(String weight) {
-        try {
-            double num = Double.parseDouble(weight);
-            return num >= MIN_WEIGHT && num <= MAX_WEIGHT;
-        } catch (NumberFormatException e) {
-            return false;
+    // ===== Yes/No =====
+    public static boolean readYesNo(Scanner scanner, String prompt) {
+        while (true) {
+            System.out.print(prompt + " (y/n): ");
+            String input = scanner.nextLine().trim();
+            checkCancel(input);
+            if (input.equalsIgnoreCase("y")) return true;
+            if (input.equalsIgnoreCase("n")) return false;
+            System.out.println("Please enter 'y' or 'n'.");
         }
     }
 
-    // ---------------- DATE ----------------
-
-    /**
-     * Validates acquisition date. Must be MM/DD/YYYY and cannot be in the future.
-     */
-    public static boolean validateDate(String date) {
-        try {
-            LocalDate parsedDate = LocalDate.parse(date, DATE_FORMAT);
-            return !parsedDate.isAfter(LocalDate.now());
-        } catch (DateTimeParseException e) {
-            return false;
+    // ===== String =====
+    public static String readNonEmpty(Scanner scanner, String prompt) {
+        while (true) {
+            System.out.print(prompt + " (or cancel): ");
+            String input = scanner.nextLine().trim();
+            checkCancel(input);
+            if (!input.isEmpty()) return input;
+            System.out.println("Input cannot be empty.");
         }
     }
 
-    // ---------------- TRAINING STATUS ----------------
+    // ===== Gender =====
+    public static String readGender(Scanner scanner) {
+        while (true) {
+            System.out.print("Enter gender (male/female): ");
+            String input = scanner.nextLine().trim();
+            checkCancel(input);
+            if (input.equalsIgnoreCase("male")) return "male";
+            if (input.equalsIgnoreCase("female")) return "female";
+            System.out.println("Invalid gender. Please enter 'male' or 'female'.");
+        }
+    }
 
-    /**
-     * Validates training status against a fixed set of acceptable values.
-     * Using an explicit whitelist prevents typos and enforces workflow states.
-     */
-    public static boolean validateTrainingStatus(String status) {
-        String[] validStatuses = {"intake", "Phase I", "Phase II", "Phase III", "Phase IV", "in service"};
-        for (String valid : validStatuses) {
-            if (valid.equalsIgnoreCase(status)) {
-                return true;
+    // ===== Numeric with ranges (US units) =====
+    public static int readBoundedInt(Scanner scanner, String prompt, int min, int max, String unit) {
+        while (true) {
+            System.out.print(prompt + " (" + unit + ", or cancel): ");
+            String input = scanner.nextLine().trim();
+            checkCancel(input);
+            try {
+                int v = Integer.parseInt(input);
+                if (v >= min && v <= max) return v;
+            } catch (NumberFormatException ignored) {}
+            System.out.println("Please enter an integer between " + min + " and " + max + " " + unit + ".");
+        }
+    }
+
+    public static double readBoundedDouble(Scanner scanner, String prompt, double min, double max, String unit) {
+        while (true) {
+            System.out.print(prompt + " (" + unit + ", or cancel): ");
+            String input = scanner.nextLine().trim();
+            checkCancel(input);
+            try {
+                double v = Double.parseDouble(input);
+                if (v >= min && v <= max) return v;
+            } catch (NumberFormatException ignored) {}
+            System.out.println("Please enter a number between " + min + " and " + max + " " + unit + ".");
+        }
+    }
+
+    // ===== Date =====
+    public static String readDate(Scanner scanner, String prompt, int age) {
+        int currentYear = LocalDate.now().getYear();
+        int minYear = currentYear - (age + 1);
+        while (true) {
+            System.out.print(prompt + " (MM/dd/yyyy): ");
+            String input = scanner.nextLine().trim();
+            checkCancel(input);
+            try {
+                LocalDate date = LocalDate.parse(input, DATE_FMT);
+                int year = date.getYear();
+                if (year >= minYear && year <= currentYear) {
+                    return input;
+                } else {
+                    System.out.println("Year must be between " + minYear + " and " + currentYear + ".");
+                }
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format. Use MM/dd/yyyy.");
             }
         }
-        return false;
     }
 
-    // ---------------- BREEDS ----------------
 
-    /**
-     * Validate dog breeds. For sake of project, only limited breeds are included.
-     */
-    public static boolean validateBreed(String breed) {
-        String[] validBreed = ACCEPTED_BREEDS;
-        for (String valid : validBreed) {
-            if (valid.equalsIgnoreCase(breed)) {
-                return true;
+    // ===== Restricted =====
+    public static String readBreed(Scanner scanner) {
+        while (true) {
+            System.out.print("Enter breed " + ALLOWED_BREEDS + " (or cancel): ");
+            String input = scanner.nextLine().trim();
+            checkCancel(input);
+            for (String breed : ALLOWED_BREEDS) {
+                if (breed.equalsIgnoreCase(input)) {
+                    return breed;
+                }
+            }
+            System.out.println("Invalid breed. Allowed: " + ALLOWED_BREEDS);
+        }
+    }
+
+    public static String readMonkeySpecies(Scanner scanner) {
+        while (true) {
+            System.out.print("Enter species " + ALLOWED_MONKEY_SPECIES + " (or cancel): ");
+            String input = scanner.nextLine().trim();
+            checkCancel(input);
+            for (String species : ALLOWED_MONKEY_SPECIES) {
+                if (species.equalsIgnoreCase(input)) {
+                    return species;
+                }
+            }
+            System.out.println("Invalid species. Allowed: " + ALLOWED_MONKEY_SPECIES);
+        }
+    }
+
+    public static String readAcquisitionCountry(Scanner scanner) {
+        while (true) {
+            System.out.print("Enter aquisition country " + ALLOWED_COUNTRIES + " (or cancel): ");
+            String input = scanner.nextLine().trim();
+            checkCancel(input);
+            for (String country : ALLOWED_COUNTRIES) {
+                if (country.equalsIgnoreCase(input)) {
+                    return country;
+                }
+            }
+            System.out.println("Invalid country. Allowed: " + ALLOWED_COUNTRIES);
+        }
+    }
+
+    public static String readInServiceCountry(Scanner scanner) {
+        while (true) {
+            System.out.print("Enter in service country " + ALLOWED_COUNTRIES + " (or cancel): ");
+            String input = scanner.nextLine().trim();
+            checkCancel(input);
+            for (String country : ALLOWED_COUNTRIES) {
+                if (country.equalsIgnoreCase(input)) {
+                    return country;
+                }
+            }
+            System.out.println("Invalid country. Allowed: " + ALLOWED_COUNTRIES);
+        }
+    }
+
+    public static String readTrainingStatus(Scanner scanner) {
+        while (true) {
+            System.out.print("Enter training status (intake, Phase I–V, in service, farm) or cancel: ");
+            String input = scanner.nextLine().trim();
+            checkCancel(input);
+            try {
+                return RescueAnimal.TrainingStatus.parse(input).menuLabel();
+            } catch (Exception e) {
+                System.out.println("Invalid training status. Must be intake, Phase I–V, in service, or farm.");
             }
         }
-        return false;
-    }
-
-    // ---------------- SPECIES ----------------
-
-    /**
-     * Validates monkey species. Keeps system consistent with project requirements
-     * (only certain species are trainable).
-     */
-    public static boolean validateSpecies(String species) {
-        String[] validSpecies = {"Capuchin", "Guenon", "Macaque", "Tamarin"};
-        for (String valid : validSpecies) {
-            if (valid.equalsIgnoreCase(species)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // ---------------- MEASUREMENTS ----------------
-
-    /**
-     * Validates monkey tail length in inches. Range enforced by project rules.
-     */
-    public static boolean validateTailLength(String value) {
-        try {
-            double num = Double.parseDouble(value);
-            return num >= MIN_TAIL_LENGTH && num <= MAX_TAIL_LENGTH;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    /**
-     * Validates monkey height in inches. Range enforced by project rules.
-     */
-    public static boolean validateHeight(String value) {
-        try {
-            double num = Double.parseDouble(value);
-            return num >= MIN_HEIGHT && num <= MAX_HEIGHT;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    /**
-     * Validates monkey body length in inches. Range enforced by project rules.
-     */
-    public static boolean validateBodyLength(String value) {
-        try {
-            double num = Double.parseDouble(value);
-            return num >= MIN_BODY_LENGTH && num <= MAX_BODY_LENGTH;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    // ---------------- GENERAL PURPOSE ----------------
-
-    /**
-     * Validates a generic positive number. Useful for fallback scenarios.
-     */
-    public static boolean validatePositiveNumber(String value) {
-        try {
-            double num = Double.parseDouble(value);
-            return num > 0;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    /**
-     * Validates reservation input for animal type.
-     * Enforces strict Dog/Monkey input.
-     */
-    public static boolean validateReserveAnimal(String animalType) {
-        return animalType.equalsIgnoreCase("dog") || animalType.equalsIgnoreCase("monkey");
-    }
-
-    // ---------------------COUNTRY---------------------
-
-    public static boolean validateCountry(String country) {
-        String[] validCountry = ACCEPTED_COUNTRIES;
-        for (String valid : validCountry) {
-            if (valid.equalsIgnoreCase(country)) {
-                return true;
-            }
-        }
-        return false;
     }
 }
