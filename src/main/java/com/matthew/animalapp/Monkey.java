@@ -32,6 +32,29 @@ public class Monkey extends RescueAnimal {
         this.bodyLength = bodyLength;
     }
 
+    // New constructor (preserves ID from DB)
+    public Monkey(String id,
+                  String name,
+                  String species,
+                  String gender,
+                  String age,
+                  String weight,
+                  String acquisitionDate,
+                  String acquisitionCountry,
+                  String trainingStatus,
+                  boolean reserved,
+                  String inServiceCountry,
+                  double tailLength,
+                  double height,
+                  double bodyLength) {
+        super(id, name, gender, age, weight, acquisitionDate, acquisitionCountry,
+                trainingStatus, reserved, inServiceCountry);
+        this.species = species;
+        this.tailLength = tailLength;
+        this.height = height;
+        this.bodyLength = bodyLength;
+    }
+
     public String getSpecies() { return species; }
     public void setSpecies(String species) { this.species = species; }
 

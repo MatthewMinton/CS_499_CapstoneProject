@@ -7,10 +7,26 @@ import java.util.stream.Collectors;
  * AnimalManager handles in-memory storage of rescue animals.
  * Uses a HashMap keyed by each animal's uniqueId.
  * Supports CRUD operations and filtering by type, training status, and reservation.
+ * Syncs with SQLite via DatabaseHelper with enhancement 3.
  */
 public class AnimalManager {
 
     private final Map<String, RescueAnimal> animals = new HashMap<>();
+    private final DatabaseHelper dbHelper;
+
+    //  Default constructor (production DB)
+    public AnimalManager() {
+        this(new DatabaseHelper(new DatabaseConnector())); // delegate to the other constructor
+    }
+
+    //  New constructor (allows injecting a custom DatabaseHelper, e.g., for tests)
+    public AnimalManager(DatabaseHelper helper) {
+        this.dbHelper = helper;
+        for (RescueAnimal animal : dbHelper.listAnimals()) {
+            animals.put(animal.getUniqueId(), animal);
+        }
+        resetIdCounter();
+    }
 
     // ===== CRUD METHODS =====
 
@@ -19,7 +35,11 @@ public class AnimalManager {
      */
     public boolean addAnimal(RescueAnimal animal) {
         if (animal == null) return false;
-        return animals.putIfAbsent(animal.getUniqueId(), animal) == null;
+        boolean added = animals.putIfAbsent(animal.getUniqueId(), animal) == null;
+        if (added) {
+            dbHelper.addOrUpdateAnimal(animal);
+        }
+        return added;
     }
 
     /**
@@ -44,6 +64,7 @@ public class AnimalManager {
         for (String key : new ArrayList<>(animals.keySet())) {
             if (key.equalsIgnoreCase(id)) {
                 animals.remove(key);
+                dbHelper.deleteAnimal(key);
                 return true;
             }
         }
@@ -119,6 +140,7 @@ public class AnimalManager {
         RescueAnimal a = animals.get(id);
         if (a == null) throw new NoSuchElementException("No animal with id: " + id);
         a.advanceTrainingOneStep();
+        dbHelper.addOrUpdateAnimal(a);
     }
 
     /**
@@ -128,6 +150,7 @@ public class AnimalManager {
         RescueAnimal a = animals.get(id);
         if (a == null) throw new NoSuchElementException("No animal with id: " + id);
         a.setTrainingStatus(newStatusRaw);
+        dbHelper.addOrUpdateAnimal(a);
     }
 
     /**
@@ -137,6 +160,7 @@ public class AnimalManager {
         RescueAnimal a = animals.get(id);
         if (a == null) throw new NoSuchElementException("No animal with id: " + id);
         a.reserve();
+        dbHelper.addOrUpdateAnimal(a);
     }
 
     /**
@@ -146,7 +170,15 @@ public class AnimalManager {
         RescueAnimal a = animals.get(id);
         if (a == null) throw new NoSuchElementException("No animal with id: " + id);
         a.unreserve();
+        dbHelper.addOrUpdateAnimal(a);
+    }
+
+    public void resetIdCounter() {
+        int max = animals.keySet().stream()
+                .map(id -> id.replace("RA-", ""))
+                .mapToInt(Integer::parseInt)
+                .max()
+                .orElse(0);
+        RescueAnimal.resetCounter(max + 1);
     }
 }
-
-

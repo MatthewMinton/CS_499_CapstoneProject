@@ -9,7 +9,7 @@ import java.util.Objects;
  * Common fields like name, gender, age, training status, etc. live here.
  * Other animals like Dog/Monkey extend this.
  */
-public abstract class RescueAnimal {
+public class RescueAnimal {
 
     // ===== Training states =====
     public enum TrainingStatus {
@@ -117,6 +117,30 @@ public abstract class RescueAnimal {
         this.reserved = reserved;
         this.inServiceCountry = inServiceCountry;
         // Normalize: if not IN_SERVICE, force not reserved and clear inServiceCountry
+        normalizeServiceFields();
+    }
+
+    // Used when LOADING from DB (preserve saved ID)
+    protected RescueAnimal(String id,
+                           String name,
+                           String gender,
+                           String age,
+                           String weight,
+                           String acquisitionDate,
+                           String acquisitionCountry,
+                           String trainingStatus,
+                           boolean reserved,
+                           String inServiceCountry) {
+        this.uniqueId = id; // <-- don’t generate, use DB’s ID
+        this.name = name;
+        this.gender = gender;
+        this.age = age;
+        this.weight = weight;
+        this.acquisitionDate = acquisitionDate;
+        this.acquisitionCountry = acquisitionCountry;
+        this.trainingStatus = TrainingStatus.parse(trainingStatus);
+        this.reserved = reserved;
+        this.inServiceCountry = inServiceCountry;
         normalizeServiceFields();
     }
     /**
@@ -299,6 +323,8 @@ public abstract class RescueAnimal {
     private static String valueOrDash(String s) {
         return (s == null || s.isBlank()) ? "-" : s;
     }
+
+    public static void resetCounter(int nextValue) {ID_COUNTER.set(nextValue);}
 }
 
 

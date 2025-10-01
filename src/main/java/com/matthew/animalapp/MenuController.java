@@ -28,6 +28,7 @@ public class MenuController {
         System.out.println(" │ [4] Print list of all monkeys       │");
         System.out.println(" │ [5] Print available animals         │");
         System.out.println(" │ [6] Update training status          │");
+        System.out.println(" │ [7] Remove an animal                │");
         System.out.println(" │ [q] Quit application                │");
         System.out.println(" └─────────────────────────────────────┘");
         System.out.print(" Enter a menu selection: ");
@@ -42,6 +43,7 @@ public class MenuController {
                 case "4" -> printMonkeys();
                 case "5" -> printAvailableAnimals();
                 case "6" -> updateTrainingStatus();
+                case "7" -> removeAnimal();
                 case "q", "Q" -> {
                     return false;
                 }
@@ -351,6 +353,56 @@ public class MenuController {
             System.out.println("Error: " + e.getMessage());
         }
     }
+
+    private void removeAnimal() {
+        System.out.println("\n--- Remove Animal ---");
+        String searchInput = Validation.readNonEmpty(scanner, "Enter animal ID or name");
+
+        // Try by ID first
+        RescueAnimal animal = manager.getAnimalById(searchInput);
+
+        // If not found, try by name
+        if (animal == null) {
+            List<RescueAnimal> matches = manager.findByName(searchInput);
+            if (matches.isEmpty()) {
+                System.out.println("No animal found with ID or name: " + searchInput);
+                return;
+            }
+            if (matches.size() > 1) {
+                System.out.println("Multiple animals found with that name:");
+                for (int i = 0; i < matches.size(); i++) {
+                    System.out.println("[" + (i + 1) + "]\n" + matches.get(i).toString());
+                }
+                int choice = Validation.readBoundedInt(scanner,
+                        "Select which animal (1-" + matches.size() + ")", 1, matches.size(), "");
+                animal = matches.get(choice - 1);
+            } else {
+                animal = matches.get(0);
+            }
+        }
+
+        // Show the record before deletion
+        System.out.println("\nSelected Animal Record:");
+        System.out.println("========================================");
+        System.out.println(animal);
+
+        // Confirm
+        boolean confirm = Validation.readYesNo(scanner,
+                "Are you sure you want to remove this animal?");
+        if (!confirm) {
+            System.out.println("Removal cancelled.");
+            return;
+        }
+
+        // Remove
+        boolean removed = manager.removeAnimal(animal.getUniqueId());
+        if (removed) {
+            System.out.println("Animal successfully removed.");
+        } else {
+            System.out.println("Failed to remove animal (not found).");
+        }
+    }
+
 
     // ====== Post-print navigation ======
     private boolean handleAfterPrint() {

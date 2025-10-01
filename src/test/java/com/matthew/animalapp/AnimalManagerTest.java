@@ -13,11 +13,15 @@ class AnimalManagerTest {
 
     @BeforeEach
     void setup() {
-        manager = new AnimalManager();
+        DatabaseHelper fakeHelper = new FakeDatabaseHelper();
+        manager = new AnimalManager(fakeHelper);
+
         dog = new Dog("Rex", "Labrador", "male", "3", "50",
                 "01/01/2022", "United States", "in service", false, "USA");
         manager.addAnimal(dog);
     }
+
+
 
     @Test
     void testAddAndGetAnimal() {

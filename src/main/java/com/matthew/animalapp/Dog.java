@@ -23,6 +23,23 @@ public class Dog extends RescueAnimal {
         this.breed = breed;
     }
 
+    // New constructor (preserves ID from DB)
+    public Dog(String id,
+               String name,
+               String breed,
+               String gender,
+               String age,
+               String weight,
+               String acquisitionDate,
+               String acquisitionCountry,
+               String trainingStatus,
+               boolean reserved,
+               String inServiceCountry) {
+        super(id, name, gender, age, weight, acquisitionDate, acquisitionCountry,
+                trainingStatus, reserved, inServiceCountry);
+        this.breed = breed;
+    }
+
     public String getBreed() { return breed; }
 
     public void setBreed(String breed) { this.breed = breed; }
