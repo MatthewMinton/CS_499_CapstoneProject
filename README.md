@@ -7,16 +7,10 @@ This project is a **Rescue Animal Management System** developed as part of the C
 
 The project demonstrates skills in **software design, database integration, object-oriented programming, input validation, and testing**.
 
-<div align="center">
-  <h2>Milestone One Code Review</h2>
-  <iframe width="560" height="315"
-          src="https://www.youtube.com/embed/y5Y3bRJQNIU&t=5s"
-          title="Milestone One Code Review"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowfullscreen>
-  </iframe>
-</div>
+## Here is a link to my original Milestone One Code Review:
+
+[![Watch the Code Review](https://img.youtube.com/vi/y5Y3bRJQNIU&t=5s/0.jpg)](https://www.youtube.com/watch?v=y5Y3bRJQNIU&t=5s)
+
 
 ---
 
